@@ -1,7 +1,12 @@
+import { SiteNavbar } from "@/components/site-navbar";
+
 export default function HomePage() {
   return (
-    <main>
-      <h1>Kajkorbo </h1>
-    </main>
+    <>
+      <SiteNavbar />
+      <main>
+        <h1>Kajkorbo </h1>
+      </main>
+    </>
   );
 }
