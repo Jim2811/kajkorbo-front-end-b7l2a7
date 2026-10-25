@@ -68,6 +68,23 @@ export default function OrganizationOverviewPage() {
         >
           Manage organization settings
         </Link>
+        <Link
+          className="ml-3 mt-6 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400"
+          href="/dashboard/billing"
+        >
+          View billing and capacity
+        </Link>
+        {organization.plan === "FREE" ? (
+          <div className="mt-6 rounded-2xl border border-lime-200 bg-lime-50 p-5">
+            <p className="text-sm font-semibold text-lime-900">Need more team capacity?</p>
+            <p className="mt-1 text-sm leading-6 text-lime-800">
+              Upgrade from the billing page to purchase additional capacity securely.
+            </p>
+            <Link className="mt-3 inline-flex text-sm font-semibold text-lime-950 underline" href="/dashboard/billing">
+              Explore upgrade options
+            </Link>
+          </div>
+        ) : null}
       </OrganizationShell>
     </OrganizationOwnerGuard>
   );
