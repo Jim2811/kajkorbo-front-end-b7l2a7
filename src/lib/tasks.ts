@@ -54,3 +54,19 @@ export async function listTasks(filters: TaskListFilters) {
 
   return apiClient<TaskListResponse>(`/tasks?${params.toString()}`);
 }
+
+export type CreateTaskInput = {
+  teamId: string;
+  title: string;
+  description: string;
+  priority?: TaskPriority;
+  startAt?: string;
+  dueAt: string;
+};
+
+export async function createTask(input: CreateTaskInput) {
+  return apiClient<ApiResponse<{ task: TaskListItem }>>("/tasks", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}

@@ -5,6 +5,7 @@ import { listTasks, taskPriorities, taskStatuses, type TaskPriority, type TaskSt
 import { useOrganizationStore } from "@/stores/organization-store";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo } from "react";
 
@@ -91,6 +92,12 @@ function TasksContent() {
             <option value="">All teams</option>
             {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
           </select>
+          <Link
+            className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            href="/dashboard/tasks/new"
+          >
+            Create task
+          </Link>
         </div>
 
         {tasksQuery.isPending ? (
