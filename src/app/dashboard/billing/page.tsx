@@ -11,6 +11,7 @@ import {
 } from "@/lib/billing";
 import { useOrganizationStore } from "@/stores/organization-store";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 function formatAmount(amount: number, currency: string) {
@@ -32,6 +33,8 @@ function statusClasses(status: Payment["status"]) {
 
 export default function BillingPage() {
   const organization = useOrganizationStore((state) => state.organization);
+  const searchParams = useSearchParams();
+  const checkoutState = searchParams.get("checkout");
   const [entitlement, setEntitlement] = useState<TeamCapacityEntitlement | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [additionalCapacity, setAdditionalCapacity] = useState("5");
@@ -56,7 +59,7 @@ export default function BillingPage() {
         setError(reason instanceof Error ? reason.message : "Unable to load billing details.");
       })
       .finally(() => setLoading(false));
-  }, [organization]);
+  }, [checkoutState, organization]);
 
   const totalCapacity = useMemo(
     () => (entitlement ? entitlement.freeTeamCapacity + entitlement.purchasedTeamCapacity : 0),
@@ -108,6 +111,23 @@ export default function BillingPage() {
         description="Review your current plan, team capacity, and payment history."
         title="Billing"
       >
+        {checkoutState === "success" ? (
+          <div className="mb-6 rounded-2xl border border-lime-200 bg-lime-50 p-5" role="status">
+            <p className="font-semibold text-lime-950">Checkout completed</p>
+            <p className="mt-1 text-sm leading-6 text-lime-900">
+              Stripe confirmed the checkout return. Billing data has been refreshed; your capacity
+              may update shortly while the payment webhook is processed.
+            </p>
+          </div>
+        ) : null}
+        {checkoutState === "cancelled" ? (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5" role="status">
+            <p className="font-semibold text-amber-950">Checkout cancelled</p>
+            <p className="mt-1 text-sm leading-6 text-amber-900">
+              No capacity was added. You can return to checkout whenever you are ready.
+            </p>
+          </div>
+        ) : null}
         {error ? (
           <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
             {error}
