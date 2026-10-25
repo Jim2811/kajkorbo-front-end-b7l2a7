@@ -7,6 +7,16 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+export class ApiClientError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiClientError";
+    this.status = status;
+  }
+}
+
 export async function apiClient<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${apiUrl}${path}`, {
     ...options,
@@ -23,10 +33,11 @@ export async function apiClient<T>(path: string, options: RequestInit = {}): Pro
     | null;
 
   if (!response.ok) {
-    throw new Error(
+    throw new ApiClientError(
       body && "message" in body && body.message
         ? body.message
         : `Request failed with status ${response.status}`,
+      response.status,
     );
   }
 

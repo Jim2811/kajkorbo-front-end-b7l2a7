@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,6 +21,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
   const [serverError, setServerError] = useState("");
   const { register: registerField, handleSubmit, formState: { errors, isSubmitting } } =
@@ -30,6 +32,12 @@ export default function LoginPage() {
     try {
       const response = await login(values);
       setUser(response.data.user);
+      queryClient.setQueryData(["auth", "me"], {
+        success: true,
+        statusCode: 200,
+        message: "Profile retrieved successfully",
+        data: { profile: response.data.user },
+      });
       router.push("/");
       router.refresh();
     } catch (error) {
