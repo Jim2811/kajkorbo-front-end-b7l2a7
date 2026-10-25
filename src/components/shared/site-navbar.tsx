@@ -10,6 +10,7 @@ const navigation = [
   { label: "Platform", href: "#platform" },
   { label: "Workflows", href: "#workflows" },
   { label: "For teams", href: "#teams" },
+  { label: "Organizations", href: "/organizations" },
 ];
 
 export function SiteNavbar() {
