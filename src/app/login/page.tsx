@@ -2,7 +2,7 @@
 
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { login } from "@/lib/auth";
+import { demoLogin, login, type DemoRole } from "@/lib/auth";
 import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
   const [serverError, setServerError] = useState("");
+  const [demoLoading, setDemoLoading] = useState<DemoRole | null>(null);
   const { register: registerField, handleSubmit, formState: { errors, isSubmitting } } =
     useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
@@ -42,6 +43,25 @@ export default function LoginPage() {
       router.refresh();
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "Unable to log in. Please try again.");
+    }
+  };
+
+  const onDemoLogin = async (role: DemoRole) => {
+    setServerError("");
+    setDemoLoading(role);
+    try {
+      const response = await demoLogin(role);
+      setUser(response.data.user);
+      queryClient.setQueryData(["auth", "me"], {
+        ...response,
+        data: { profile: response.data.user },
+      });
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      setServerError(error instanceof Error ? error.message : "Demo login is unavailable.");
+    } finally {
+      setDemoLoading(null);
     }
   };
 
@@ -88,6 +108,28 @@ export default function LoginPage() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
       </form>
+      <div className="mt-7 border-t border-slate-200 pt-6">
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+          Try a demo workspace
+        </p>
+        <div className="mt-4 grid gap-2">
+          {([
+            ["admin", "Platform admin"],
+            ["owner", "Organization owner"],
+            ["member", "Delivery team"],
+          ] as const).map(([role, label]) => (
+            <button
+              className="rounded-xl border border-slate-200 px-3.5 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:border-lime-500 hover:bg-lime-50 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSubmitting || demoLoading !== null}
+              key={role}
+              onClick={() => onDemoLogin(role)}
+              type="button"
+            >
+              {demoLoading === role ? "Signing in..." : label}
+            </button>
+          ))}
+        </div>
+      </div>
     </AuthShell>
   );
 }

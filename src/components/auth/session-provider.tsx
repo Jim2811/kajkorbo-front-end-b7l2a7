@@ -1,19 +1,13 @@
 "use client";
 
-import { getCurrentUser } from "@/lib/auth";
+import { useAuthMeQuery } from "@/lib/auth-query";
 import { useAuthStore } from "@/stores/auth-store";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 export function SessionProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const setUser = useAuthStore((state) => state.setUser);
   const setLoading = useAuthStore((state) => state.setLoading);
-  const sessionQuery = useQuery({
-    queryKey: ["auth", "me"],
-    queryFn: getCurrentUser,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-  });
+  const sessionQuery = useAuthMeQuery();
 
   useEffect(() => {
     if (sessionQuery.isSuccess) {

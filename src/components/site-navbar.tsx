@@ -1,6 +1,8 @@
 "use client";
 
 import { ArrowUpRight, Menu, X } from "lucide-react";
+import { getNavigationForRole } from "@/lib/navigation";
+import { useAuthStore } from "@/stores/auth-store";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -12,6 +14,8 @@ const navigation = [
 
 export function SiteNavbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const links = user ? getNavigationForRole(user.role) : navigation;
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
@@ -32,7 +36,7 @@ export function SiteNavbar() {
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
-          {navigation.map((item) => (
+          {links.map((item) => (
             <Link
               className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"
               href={item.href}
@@ -73,7 +77,7 @@ export function SiteNavbar() {
       {isOpen ? (
         <div className="border-t border-slate-200 bg-white px-5 pb-5 md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 pt-3">
-            {navigation.map((item) => (
+            {links.map((item) => (
               <Link
                 className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                 href={item.href}

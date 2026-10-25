@@ -59,3 +59,28 @@ export async function verifyEmail(input: { email: string; otp: string }) {
 export async function getCurrentUser() {
   return apiClient<ApiResponse<{ profile: AuthUser }>>("/auth/me");
 }
+
+export type DemoRole = "admin" | "owner" | "member";
+
+export async function demoLogin(role: DemoRole) {
+  const response = await fetch("/api/auth/demo-login", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }),
+  });
+  const body = (await response.json().catch(() => null)) as
+    | ApiResponse<AuthPayload>
+    | { message?: string }
+    | null;
+
+  if (!response.ok) {
+    throw new Error(
+      body && "message" in body && body.message
+        ? body.message
+        : "Demo login is not available.",
+    );
+  }
+
+  return body as ApiResponse<AuthPayload>;
+}
