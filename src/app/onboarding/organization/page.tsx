@@ -5,6 +5,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { createOrganization } from "@/lib/organization";
 import { useAuthMeQuery } from "@/lib/auth-query";
 import { useAuthStore } from "@/stores/auth-store";
+import { useOrganizationStore } from "@/stores/organization-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ export default function OrganizationOnboardingPage() {
   const user = useAuthStore((state) => state.user);
   const isSessionLoading = useAuthStore((state) => state.isLoading);
   const setUser = useAuthStore((state) => state.setUser);
+  const setOrganization = useOrganizationStore((state) => state.setOrganization);
   const sessionQuery = useAuthMeQuery();
   const [serverError, setServerError] = useState("");
   const [createdOrganization, setCreatedOrganization] = useState<string | null>(null);
@@ -54,6 +56,7 @@ export default function OrganizationOnboardingPage() {
         address: values.address || undefined,
       });
       setCreatedOrganization(response.data.organization.name);
+      setOrganization(response.data.organization);
       if (currentUser) {
         setUser({ ...currentUser, role: "ORG_OWNER" });
       }

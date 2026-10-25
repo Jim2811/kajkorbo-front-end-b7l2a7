@@ -26,3 +26,22 @@ export async function createOrganization(input: CreateOrganizationInput) {
     body: JSON.stringify(input),
   });
 }
+
+export type UpdateOrganizationInput = Omit<Partial<CreateOrganizationInput>, "phone" | "address"> & {
+  phone?: string | null;
+  address?: string | null;
+  logo?: string | null;
+};
+
+export async function updateOrganization(
+  organizationId: string,
+  input: UpdateOrganizationInput,
+) {
+  return apiClient<ApiResponse<{ organization: Organization }>>(
+    `/organizations/${organizationId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    },
+  );
+}
