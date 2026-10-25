@@ -39,7 +39,7 @@ export default function LoginPage() {
         message: "Profile retrieved successfully",
         data: { profile: response.data.user },
       });
-      router.push("/");
+      router.push(response.data.user.role === "USER" ? "/onboarding/organization" : "/");
       router.refresh();
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "Unable to log in. Please try again.");
@@ -56,7 +56,7 @@ export default function LoginPage() {
         ...response,
         data: { profile: response.data.user },
       });
-      router.push("/");
+      router.push(response.data.user.role === "USER" ? "/onboarding/organization" : "/");
       router.refresh();
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "Demo login is unavailable.");
