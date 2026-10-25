@@ -1,6 +1,6 @@
 "use client";
 
-import type { Organization, Team } from "@/lib/organization";
+import type { Organization, Team } from "@/app/(dashboardGroup)/_actions/organization-actions";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

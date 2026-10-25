@@ -1,6 +1,6 @@
 "use client";
 
-import type { Subtask, TaskListItem } from "@/lib/tasks";
+import type { Subtask, TaskListItem } from "@/app/(dashboardGroup)/_actions/task-actions";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
