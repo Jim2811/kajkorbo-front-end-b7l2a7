@@ -24,6 +24,9 @@ export type TaskListItem = {
   status: TaskStatus;
   dueAt: string;
   teamId: string;
+  startAt?: string | null;
+  createdAt?: string;
+  rejectionReason?: string | null;
 };
 
 export type TaskListFilters = {
@@ -68,5 +71,24 @@ export async function createTask(input: CreateTaskInput) {
   return apiClient<ApiResponse<{ task: TaskListItem }>>("/tasks", {
     method: "POST",
     body: JSON.stringify(input),
+  });
+}
+
+export async function acceptTask(taskId: string) {
+  return apiClient<ApiResponse<{ task: TaskListItem }>>(`/tasks/${taskId}/accept`, {
+    method: "POST",
+  });
+}
+
+export async function rejectTask(taskId: string, reason: string) {
+  return apiClient<ApiResponse<{ task: TaskListItem }>>(`/tasks/${taskId}/reject`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function completeTask(taskId: string) {
+  return apiClient<ApiResponse<{ task: TaskListItem }>>(`/tasks/${taskId}/complete`, {
+    method: "POST",
   });
 }

@@ -3,6 +3,7 @@
 import { OrganizationShell } from "@/components/organization/organization-shell";
 import { listTasks, taskPriorities, taskStatuses, type TaskPriority, type TaskStatus } from "@/lib/tasks";
 import { useOrganizationStore } from "@/stores/organization-store";
+import { useTaskStore } from "@/stores/task-store";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
 import Link from "next/link";
@@ -115,7 +116,7 @@ function TasksContent() {
         ) : tasksQuery.data?.data.tasks.length ? (
           <div className="mt-6 divide-y divide-slate-100">
             {tasksQuery.data.data.tasks.map((task) => (
-              <article className="flex flex-wrap items-center gap-4 py-4" key={task.id}>
+              <Link className="flex flex-wrap items-center gap-4 py-4" href={`/dashboard/tasks/${task.id}`} key={task.id}>
                 <div className="mr-auto min-w-48">
                   <h2 className="font-semibold text-slate-950">{task.title}</h2>
                   <p className="mt-1 line-clamp-1 text-sm text-slate-500">{task.description}</p>
@@ -123,7 +124,7 @@ function TasksContent() {
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{task.status.replaceAll("_", " ")}</span>
                 <span className="rounded-full bg-lime-100 px-3 py-1 text-xs font-semibold text-lime-800">{task.priority}</span>
                 <time className="text-xs text-slate-500" dateTime={task.dueAt}>{new Date(task.dueAt).toLocaleDateString()}</time>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (

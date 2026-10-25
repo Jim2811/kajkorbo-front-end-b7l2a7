@@ -5,6 +5,7 @@ import { OrganizationOwnerGuard } from "@/components/organization/organization-o
 import { OrganizationShell } from "@/components/organization/organization-shell";
 import { createTask, taskPriorities, type TaskPriority } from "@/lib/tasks";
 import { useOrganizationStore } from "@/stores/organization-store";
+import { useTaskStore } from "@/stores/task-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -46,6 +47,7 @@ function toIso(value: string) {
 export default function NewTaskPage() {
   const router = useRouter();
   const teams = useOrganizationStore((state) => state.teams);
+  const addTask = useTaskStore((state) => state.addTask);
   const [serverError, setServerError] = useState("");
   const [created, setCreated] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting } } =
@@ -66,6 +68,7 @@ export default function NewTaskPage() {
         startAt: values.startAt ? toIso(values.startAt) : undefined,
         dueAt: toIso(values.dueAt),
       });
+      addTask(response.data.task);
       setCreated(response.data.task.title);
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "Unable to create task.");
