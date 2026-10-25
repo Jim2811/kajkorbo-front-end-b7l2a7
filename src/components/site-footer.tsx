@@ -52,7 +52,7 @@ export function SiteFooter() {
             </p>
             <Link
               className="mt-7 inline-flex items-center gap-2 rounded-full bg-lime-300 px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-lime-200"
-              href="#get-started"
+              href="/register"
             >
               Start building
               <ArrowUpRight aria-hidden="true" size={15} strokeWidth={2.5} />

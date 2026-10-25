@@ -46,13 +46,13 @@ export function SiteNavbar() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             className="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950"
-            href="#sign-in"
+            href="/login"
           >
             Sign in
           </Link>
           <Link
             className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
-            href="#get-started"
+            href="/register"
           >
             Get started
             <ArrowUpRight aria-hidden="true" size={15} strokeWidth={2.5} />
@@ -86,14 +86,14 @@ export function SiteNavbar() {
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
               <Link
                 className="rounded-full border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
-                href="#sign-in"
+                href="/login"
                 onClick={() => setIsOpen(false)}
               >
                 Sign in
               </Link>
               <Link
                 className="rounded-full bg-slate-950 px-4 py-2.5 text-center text-sm font-semibold text-white"
-                href="#get-started"
+                href="/register"
                 onClick={() => setIsOpen(false)}
               >
                 Get started

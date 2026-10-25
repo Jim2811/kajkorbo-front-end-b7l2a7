@@ -27,7 +27,7 @@ export default function HomePage() {
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
                   className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
-                  href="#get-started"
+                  href="/register"
                 >
                   Start your workspace
                   <ArrowRight aria-hidden="true" size={17} />
