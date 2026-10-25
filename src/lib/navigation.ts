@@ -19,6 +19,16 @@ export const roleAwareNavigation: NavigationItem[] = [
     roles: ["ORG_OWNER"],
   },
   {
+    label: "Members",
+    href: "/dashboard/organization/members",
+    roles: ["ORG_OWNER"],
+  },
+  {
+    label: "Teams",
+    href: "/dashboard/organization/teams",
+    roles: ["ORG_OWNER"],
+  },
+  {
     label: "Billing",
     href: "/dashboard/billing",
     roles: ["ORG_OWNER"],
