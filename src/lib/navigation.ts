@@ -38,6 +38,11 @@ export const roleAwareNavigation: NavigationItem[] = [
     href: "/admin",
     roles: ["SUPER_ADMIN"],
   },
+  {
+    label: "Complaints",
+    href: "/dashboard/complaints",
+    roles: ["SUPER_ADMIN", "ORG_OWNER", "ORG_MEMBER", "TEAM_LEADER", "TEAM_MEMBER", "USER"],
+  },
 ];
 
 export function getNavigationForRole(role: UserRole | undefined) {
