@@ -29,6 +29,24 @@ export type TaskListItem = {
   rejectionReason?: string | null;
 };
 
+export type SubtaskStatus =
+  | "ASSIGNED"
+  | "IN_PROGRESS"
+  | "SUBMITTED"
+  | "REVISION_REQUIRED"
+  | "APPROVED"
+  | "CANCELLED";
+
+export type Subtask = {
+  id: string;
+  taskId: string;
+  assignedUserId: string;
+  title: string;
+  description: string;
+  dueAt: string;
+  status: SubtaskStatus;
+};
+
 export type TaskListFilters = {
   status?: TaskStatus;
   priority?: TaskPriority;
@@ -90,5 +108,43 @@ export async function rejectTask(taskId: string, reason: string) {
 export async function completeTask(taskId: string) {
   return apiClient<ApiResponse<{ task: TaskListItem }>>(`/tasks/${taskId}/complete`, {
     method: "POST",
+  });
+}
+
+export async function createSubtask(
+  taskId: string,
+  input: { assignedUserId: string; title: string; description: string; dueAt: string },
+) {
+  return apiClient<ApiResponse<{ subtask: Subtask }>>(`/tasks/${taskId}/subtasks`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function submitSubtask(subtaskId: string, description: string) {
+  return apiClient<ApiResponse<{ submission: { id: string; description: string } }>>(
+    `/tasks/subtasks/${subtaskId}/submit`,
+    { method: "POST", body: JSON.stringify({ description }) },
+  );
+}
+
+export async function approveSubtask(subtaskId: string, feedback?: string) {
+  return apiClient<ApiResponse<{ subtask: Subtask }>>(`/tasks/subtasks/${subtaskId}/approve`, {
+    method: "POST",
+    body: JSON.stringify({ feedback: feedback || undefined }),
+  });
+}
+
+export async function requestSubtaskRevision(subtaskId: string, feedback: string) {
+  return apiClient<ApiResponse<{ subtask: Subtask }>>(
+    `/tasks/subtasks/${subtaskId}/request-revision`,
+    { method: "POST", body: JSON.stringify({ feedback }) },
+  );
+}
+
+export async function reassignSubtask(subtaskId: string, assignedUserId: string) {
+  return apiClient<ApiResponse<{ subtask: Subtask }>>(`/tasks/subtasks/${subtaskId}/reassign`, {
+    method: "POST",
+    body: JSON.stringify({ assignedUserId }),
   });
 }
