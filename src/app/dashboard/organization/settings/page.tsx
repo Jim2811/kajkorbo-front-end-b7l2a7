@@ -2,6 +2,7 @@
 
 import { AuthField } from "@/components/auth/auth-field";
 import { OrganizationShell } from "@/components/organization/organization-shell";
+import { OrganizationOwnerGuard } from "@/components/organization/organization-owner-guard";
 import { updateOrganization } from "@/lib/organization";
 import { useOrganizationStore } from "@/stores/organization-store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,12 +41,14 @@ export default function OrganizationSettingsPage() {
 
   if (!organization) {
     return (
-      <OrganizationShell description="Connect an organization before changing its settings." title="Organization settings">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-          No organization is available in this browser session.{" "}
-          <Link className="font-semibold underline" href="/onboarding/organization">Open onboarding</Link>
-        </div>
-      </OrganizationShell>
+      <OrganizationOwnerGuard>
+        <OrganizationShell description="Connect an organization before changing its settings." title="Organization settings">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+            No organization is available in this browser session.{" "}
+            <Link className="font-semibold underline" href="/onboarding/organization">Open onboarding</Link>
+          </div>
+        </OrganizationShell>
+      </OrganizationOwnerGuard>
     );
   }
 
@@ -67,8 +70,9 @@ export default function OrganizationSettingsPage() {
   };
 
   return (
-    <OrganizationShell description="Update the details your team and members see." title="Organization settings">
-      <form className="max-w-2xl space-y-5 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
+    <OrganizationOwnerGuard>
+      <OrganizationShell description="Update the details your team and members see." title="Organization settings">
+        <form className="max-w-2xl space-y-5 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
         {serverError ? <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{serverError}</p> : null}
         {saved ? <p className="rounded-xl border border-lime-200 bg-lime-50 px-4 py-3 text-sm text-lime-800" role="status">Organization settings saved.</p> : null}
         <AuthField error={errors.name?.message} label="Organization name" {...register("name")} />
@@ -85,7 +89,8 @@ export default function OrganizationSettingsPage() {
         <button className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isSubmitting} type="submit">
           {isSubmitting ? "Saving..." : "Save changes"}
         </button>
-      </form>
-    </OrganizationShell>
+        </form>
+      </OrganizationShell>
+    </OrganizationOwnerGuard>
   );
 }

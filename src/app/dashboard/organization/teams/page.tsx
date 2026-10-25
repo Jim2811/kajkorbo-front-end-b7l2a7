@@ -2,6 +2,7 @@
 
 import { AuthField } from "@/components/auth/auth-field";
 import { OrganizationShell } from "@/components/organization/organization-shell";
+import { OrganizationOwnerGuard } from "@/components/organization/organization-owner-guard";
 import { addTeamMember, assignTeamLeader, createTeam, deleteTeam, removeTeamMember } from "@/lib/organization";
 import { useOrganizationStore } from "@/stores/organization-store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,11 +31,13 @@ export default function OrganizationTeamsPage() {
 
   if (!organization) {
     return (
-      <OrganizationShell description="Connect an organization first." title="Teams">
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-          Organization context is unavailable in this browser session.
-        </p>
-      </OrganizationShell>
+      <OrganizationOwnerGuard>
+        <OrganizationShell description="Connect an organization first." title="Teams">
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+            Organization context is unavailable in this browser session.
+          </p>
+        </OrganizationShell>
+      </OrganizationOwnerGuard>
     );
   }
 
@@ -97,8 +100,9 @@ export default function OrganizationTeamsPage() {
   };
 
   return (
-    <OrganizationShell description="Create teams and manage their membership." title="Teams">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+    <OrganizationOwnerGuard>
+      <OrganizationShell description="Create teams and manage their membership." title="Teams">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <form className="h-fit space-y-5 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8" onSubmit={handleSubmit(onCreate)}>
           <div>
             <h2 className="text-lg font-semibold text-slate-950">Create a team</h2>
@@ -144,7 +148,8 @@ export default function OrganizationTeamsPage() {
             </article>
           ))}
         </div>
-      </div>
-    </OrganizationShell>
+        </div>
+      </OrganizationShell>
+    </OrganizationOwnerGuard>
   );
 }

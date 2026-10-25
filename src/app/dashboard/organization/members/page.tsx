@@ -2,6 +2,7 @@
 
 import { AuthField } from "@/components/auth/auth-field";
 import { OrganizationShell } from "@/components/organization/organization-shell";
+import { OrganizationOwnerGuard } from "@/components/organization/organization-owner-guard";
 import { inviteOrganizationMember } from "@/lib/organization";
 import { useOrganizationStore } from "@/stores/organization-store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,11 +25,13 @@ export default function OrganizationMembersPage() {
 
   if (!organization) {
     return (
-      <OrganizationShell description="Connect an organization first." title="Members">
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-          Organization context is unavailable in this browser session.
-        </p>
-      </OrganizationShell>
+      <OrganizationOwnerGuard>
+        <OrganizationShell description="Connect an organization first." title="Members">
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+            Organization context is unavailable in this browser session.
+          </p>
+        </OrganizationShell>
+      </OrganizationOwnerGuard>
     );
   }
 
@@ -45,11 +48,12 @@ export default function OrganizationMembersPage() {
   };
 
   return (
-    <OrganizationShell
-      description="Invite existing Kajkorbo users to join your organization."
-      title="Members"
-    >
-      <div className="max-w-xl rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
+    <OrganizationOwnerGuard>
+      <OrganizationShell
+        description="Invite existing Kajkorbo users to join your organization."
+        title="Members"
+      >
+        <div className="max-w-xl rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
         <h2 className="text-lg font-semibold text-slate-950">Invite a member</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           The user must already have a Kajkorbo account. Pending invitations are managed by the backend.
@@ -69,7 +73,8 @@ export default function OrganizationMembersPage() {
             {isSubmitting ? "Sending invitation..." : "Send invitation"}
           </button>
         </form>
-      </div>
-    </OrganizationShell>
+        </div>
+      </OrganizationShell>
+    </OrganizationOwnerGuard>
   );
 }
