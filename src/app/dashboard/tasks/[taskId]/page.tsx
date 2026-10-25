@@ -82,7 +82,11 @@ function SubtaskCard({
   subtask: Subtask;
   canReview: boolean;
   currentUserId?: string;
-  onAction: (name: string, action: () => Promise<SubtaskActionResponse>) => Promise<void>;
+  onAction: (
+    name: string,
+    action: () => Promise<SubtaskActionResponse>,
+    optimisticSubtask?: Subtask,
+  ) => Promise<void>;
   submissionForm: ReturnType<typeof useForm<TextForm>>;
   reviewForm: ReturnType<typeof useForm<TextForm>>;
   reassignForm: ReturnType<typeof useForm<ReassignForm>>;
@@ -120,7 +124,7 @@ function SubtaskCard({
                   subtask: { ...subtask, status: "SUBMITTED" },
                 },
               };
-            }),
+            }, { ...subtask, status: "SUBMITTED" }),
           )}
         >
           <label className="block text-sm font-medium text-slate-800">
@@ -150,7 +154,7 @@ function SubtaskCard({
           <form
             className="space-y-3"
             onSubmit={reviewForm.handleSubmit((values) =>
-              onAction(`approve-${subtask.id}`, () => approveSubtask(subtask.id, values.text)),
+              onAction(`approve-${subtask.id}`, () => approveSubtask(subtask.id, values.text), { ...subtask, status: "APPROVED" }),
             )}
           >
             <input
@@ -169,7 +173,7 @@ function SubtaskCard({
           <form
             className="space-y-3"
             onSubmit={reviewForm.handleSubmit((values) =>
-              onAction(`revision-${subtask.id}`, () => requestSubtaskRevision(subtask.id, values.text)),
+              onAction(`revision-${subtask.id}`, () => requestSubtaskRevision(subtask.id, values.text), { ...subtask, status: "REVISION_REQUIRED" }),
             )}
           >
             <input
@@ -192,7 +196,7 @@ function SubtaskCard({
         <form
           className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4"
           onSubmit={reassignForm.handleSubmit((values) =>
-            onAction(`reassign-${subtask.id}`, () => reassignSubtask(subtask.id, values.assignedUserId)),
+            onAction(`reassign-${subtask.id}`, () => reassignSubtask(subtask.id, values.assignedUserId), { ...subtask, assignedUserId: values.assignedUserId }),
           )}
         >
           <input
@@ -223,8 +227,10 @@ export default function TaskDetailsPage() {
   const task = useTaskStore((state) => state.tasks.find((item) => item.id === params.taskId));
   const subtasks = useTaskStore((state) => state.subtasks.filter((item) => item.taskId === params.taskId));
   const updateTask = useTaskStore((state) => state.updateTask);
+  const setTask = useTaskStore((state) => state.setTask);
   const addSubtask = useTaskStore((state) => state.addSubtask);
   const updateSubtask = useTaskStore((state) => state.updateSubtask);
+  const setSubtask = useTaskStore((state) => state.setSubtask);
   const [actionError, setActionError] = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } =
@@ -251,14 +257,21 @@ export default function TaskDetailsPage() {
     );
   }
 
-  const runAction = async (name: string, action: () => Promise<{ data: { task: TaskListItem } }>) => {
+  const runAction = async (
+    name: string,
+    action: () => Promise<{ data: { task: TaskListItem } }>,
+    optimisticTask?: TaskListItem,
+  ) => {
     setActionError("");
     setActionLoading(name);
+    const previousTask = task;
+    if (optimisticTask) setTask(optimisticTask);
     try {
       const response = await action();
       updateTask(response.data.task);
       reset();
     } catch (error) {
+      if (optimisticTask) setTask(previousTask);
       setActionError(error instanceof Error ? error.message : "Unable to update task.");
     } finally {
       setActionLoading("");
@@ -301,11 +314,11 @@ export default function TaskDetailsPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
               <h2 className="text-lg font-semibold text-slate-950">Review assignment</h2>
               <div className="mt-5 flex flex-wrap gap-3">
-                <button className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={Boolean(actionLoading)} onClick={() => runAction("accept", () => acceptTask(task.id))} type="button">
+                <button className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={Boolean(actionLoading)} onClick={() => runAction("accept", () => acceptTask(task.id), { ...task, status: "ACCEPTED", rejectionReason: null })} type="button">
                   {actionLoading === "accept" ? "Accepting..." : "Accept task"}
                 </button>
               </div>
-              <form className="mt-5 space-y-3" onSubmit={handleSubmit((values) => runAction("reject", () => rejectTask(task.id, values.reason)))}>
+              <form className="mt-5 space-y-3" onSubmit={handleSubmit((values) => runAction("reject", () => rejectTask(task.id, values.reason), { ...task, status: "REJECTED", rejectionReason: values.reason }))}>
                 <AuthField error={errors.reason?.message} label="Rejection reason" placeholder="Explain what needs to change" {...register("reason")} />
                 <button className="rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:opacity-60" disabled={isSubmitting || Boolean(actionLoading)} type="submit">
                   {actionLoading === "reject" ? "Rejecting..." : "Reject task"}
@@ -318,7 +331,7 @@ export default function TaskDetailsPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
               <h2 className="text-lg font-semibold text-slate-950">Complete task</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">Completion is allowed after required subtasks are approved by the backend.</p>
-              <button className="mt-5 rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={Boolean(actionLoading)} onClick={() => runAction("complete", () => completeTask(task.id))} type="button">
+              <button className="mt-5 rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={Boolean(actionLoading)} onClick={() => runAction("complete", () => completeTask(task.id), { ...task, status: "COMPLETED" })} type="button">
                 {actionLoading === "complete" ? "Completing..." : "Mark as completed"}
               </button>
             </section>
@@ -357,13 +370,16 @@ export default function TaskDetailsPage() {
                   subtask={subtask}
                   canReview={canReview}
                   currentUserId={user?.id}
-                  onAction={async (name, action) => {
+                  onAction={async (name, action, optimisticSubtask) => {
                     setActionLoading(name);
                     setActionError("");
+                    const previousSubtask = subtask;
+                    if (optimisticSubtask) setSubtask(optimisticSubtask);
                     try {
                       const response = await action();
                       if (response.data.subtask) updateSubtask(response.data.subtask);
                     } catch (error) {
+                      if (optimisticSubtask) setSubtask(previousSubtask);
                       setActionError(error instanceof Error ? error.message : "Unable to update subtask.");
                     } finally {
                       setActionLoading("");

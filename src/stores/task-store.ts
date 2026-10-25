@@ -9,8 +9,10 @@ type TaskState = {
   subtasks: Subtask[];
   addTask: (task: TaskListItem) => void;
   updateTask: (task: TaskListItem) => void;
+  setTask: (task: TaskListItem) => void;
   addSubtask: (subtask: Subtask) => void;
   updateSubtask: (subtask: Subtask) => void;
+  setSubtask: (subtask: Subtask) => void;
 };
 
 export const useTaskStore = create<TaskState>()(
@@ -23,11 +25,19 @@ export const useTaskStore = create<TaskState>()(
         set((state) => ({
           tasks: state.tasks.map((item) => (item.id === task.id ? task : item)),
         })),
+      setTask: (task) =>
+        set((state) => ({
+          tasks: state.tasks.map((item) => (item.id === task.id ? task : item)),
+        })),
       addSubtask: (subtask) =>
         set((state) => ({
           subtasks: [subtask, ...state.subtasks.filter((item) => item.id !== subtask.id)],
         })),
       updateSubtask: (subtask) =>
+        set((state) => ({
+          subtasks: state.subtasks.map((item) => (item.id === subtask.id ? subtask : item)),
+        })),
+      setSubtask: (subtask) =>
         set((state) => ({
           subtasks: state.subtasks.map((item) => (item.id === subtask.id ? subtask : item)),
         })),
